@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple Chat AI</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        #chat { border: 1px solid #ccc; height: 400px; overflow-y: auto; padding: 10px; }
+        .message { margin: 10px 0; }
+        .user { color: blue; }
+        .assistant { color: green; }
+        #input { width: 80%; padding: 10px; }
+        button { padding: 10px; }
+    </style>
+</head>
+<body>
+    <h1>Chat AI</h1>
+    <div id="chat"></div>
+    <input id="input" type="text" placeholder="Type your message...">
+    <button onclick="sendMessage()">Send</button>
+
+    <script>
+        let conversationId = null;
+
+        function addMessage(role, content, timestamp) {
+            const chat = document.getElementById('chat');
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `message ${role}`;
+            msgDiv.innerHTML = `<strong>${role} (${timestamp}):</strong> ${content}`;
+            chat.appendChild(msgDiv);
+            chat.scrollTop = chat.scrollHeight;
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('input');
+            const message = input.value.trim();
+            if (!message) return;
+
+            addMessage('user', message, new Date().toLocaleTimeString());
+            input.value = '';
+
+            // Show loading
+            const loadingDiv = document.createElement('div');
+            loadingDiv.id = 'loading';
+            loadingDiv.innerHTML = '<em>Loading...</em>';
+            document.getElementById('chat').appendChild(loadingDiv);
+
+            try {
+                const response = await fetch('/api/chat/send', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message, conversation_id: conversationId })
+                });
+                const data = await response.json();
+                conversationId = data.conversation_id;
+
+                // Remove loading
+                document.getElementById('loading').remove();
+
+                addMessage('assistant', data.response, new Date().toLocaleTimeString());
+            } catch (error) {
+                document.getElementById('loading').remove();
+                addMessage('assistant', 'Error: ' + error.message, new Date().toLocaleTimeString());
+            }
+        }
+
+        document.getElementById('input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') sendMessage();
+        });
+    </script>
+</body>
+</html>
