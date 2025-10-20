@@ -1,3 +1,13 @@
 # Environment files
 .env
 .env.*
+uploads/
+
+#Log files 
+app.log
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
