@@ -149,7 +149,7 @@ The application will be served at `http://127.0.0.1:8000`.
 4.  For **CSV Chat**, either upload a file or provide a URL and use the "Process URL" button before submitting queries.
 5.  The "Clear" button in the input area can be used to reset the current conversation.
 
-## Quick Start with Docker (Recommended)
+## Quick Start with Docker 
 
 Docker provides the fastest way to get the application running without manual dependency management.
 
@@ -157,7 +157,7 @@ Docker provides the fastest way to get the application running without manual de
 - Docker and Docker Compose installed
 - API keys (OpenAI or Google Gemini)
 
-### Method 1: Automated Setup (Recommended)
+### Method 1: Automated Setup 
 ```bash
 # 1. Clone repository
 git clone https://github.com/your-username/your-repo-name.git
@@ -222,7 +222,10 @@ docker-compose restart
 # Clean up
 docker-compose down -v
 ```
+## Demo Video
 
-## License
+A short demo: 
 
-This project is licensed under the MIT License.
+<video width="560" height="315" controls>
+  <source src="demo/demo.mp4" type="video/mp4">
+</video>
