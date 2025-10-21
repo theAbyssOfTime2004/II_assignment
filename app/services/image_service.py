@@ -5,7 +5,8 @@ import json
 import base64
 from pathlib import Path
 from openai import OpenAI
-from app.core.config import OPENAI_API_KEY
+from app.core.config import OPENAI_API_KEY, LLM_PROVIDER
+from app.core.gemini import gemini_service
 from app.services.redis_service import redis_service
 import logging
 from PIL import Image
@@ -23,9 +24,11 @@ class ImageService:
     MAX_DIMENSION = 4096  # Max width or height
     
     def __init__(self):
-        self.client = OpenAI(api_key=OPENAI_API_KEY)
+        self.provider = LLM_PROVIDER
+        self.openai_client = OpenAI(api_key=OPENAI_API_KEY) if OPENAI_API_KEY else None
         self.upload_dir = Path("uploads/images")
         self.upload_dir.mkdir(parents=True, exist_ok=True)
+        logger.info(f"Image Service initialized with provider: {self.provider}")
 
     async def process_image_message(
         self, 
@@ -42,17 +45,22 @@ class ImageService:
             
             # Get current image path
             current_image_path = None
+            current_image_data = None
             
             # If new image is uploaded, validate and save it
             if image_data and image_filename:
                 current_image_path = await self._validate_and_save_image(
                     image_data, image_filename, conversation_id
                 )
+                current_image_data = image_data
             else:
                 # Use the last image from history
                 for msg in reversed(history):
                     if msg.get("image"):
                         current_image_path = msg["image"]
+                        # Load image data from file
+                        with open(current_image_path, "rb") as f:
+                            current_image_data = f.read()
                         break
             
             if not current_image_path:
@@ -77,20 +85,26 @@ class ImageService:
             }
             history.append(user_msg)
             
-            # Build conversation messages for OpenAI
-            messages = self._build_messages(history, current_image_path)
-            
-            # Query with image
+            # Query with image based on provider
             try:
-                response = self.client.chat.completions.create(
-                    model="gpt-4o-mini",
-                    messages=messages,
-                    max_tokens=500,
-                    timeout=30
-                )
-                response_text = response.choices[0].message.content
+                if self.provider == "gemini":
+                    response_text = await self._query_with_gemini(
+                        message, 
+                        current_image_data, 
+                        history
+                    )
+                else:  # OpenAI
+                    response_text = await self._query_with_openai(
+                        message, 
+                        current_image_path, 
+                        history
+                    )
+                    
+                if not response_text:
+                    response_text = "⚠️ Xin lỗi, tôi không thể phân tích ảnh lúc này. Vui lòng thử lại sau."
+                    
             except Exception as e:
-                logger.error(f"OpenAI API error: {e}")
+                logger.error(f"LLM API error: {e}")
                 response_text = f"⚠️ **Lỗi API:** Không thể phân tích ảnh. {str(e)}\n\n💡 Vui lòng thử lại sau."
             
             # Add assistant message
@@ -123,6 +137,47 @@ class ImageService:
                 "conversation_id": conversation_id
             }
 
+    async def _query_with_gemini(
+        self, 
+        message: str, 
+        image_data: bytes, 
+        history: List[Dict]
+    ) -> str:
+        """Query using Google Gemini"""
+        # Build context from history
+        context = "Lịch sử hội thoại:\n"
+        for msg in history[-5:]:  # Last 5 messages
+            if msg["role"] == "user":
+                context += f"Người dùng: {msg['content']}\n"
+            else:
+                context += f"Trợ lý: {msg['content']}\n"
+        
+        full_prompt = f"{context}\nCâu hỏi hiện tại: {message}\n\nVui lòng phân tích ảnh và trả lời bằng tiếng Việt."
+        
+        return gemini_service.call_llm_with_image(
+            prompt=full_prompt,
+            image_data=image_data,
+            temperature=0.7,
+            max_tokens=500
+        )
+
+    async def _query_with_openai(
+        self, 
+        message: str, 
+        image_path: str, 
+        history: List[Dict]
+    ) -> str:
+        """Query using OpenAI GPT-4 Vision"""
+        messages = self._build_openai_messages(history, image_path)
+        
+        response = self.openai_client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=messages,
+            max_tokens=500,
+            timeout=30
+        )
+        return response.choices[0].message.content
+
     async def _validate_and_save_image(
         self, 
         image_data: bytes, 
@@ -147,17 +202,14 @@ class ImageService:
             # Validate image with PIL
             try:
                 img = Image.open(io.BytesIO(image_data))
-                img.verify()  # Verify it's a valid image
+                img.verify()
                 
-                # Re-open for further processing (verify() closes the file)
                 img = Image.open(io.BytesIO(image_data))
-                
-                # Check dimensions
                 width, height = img.size
+                
                 if width > self.MAX_DIMENSION or height > self.MAX_DIMENSION:
                     raise ImageError(f"Kích thước ảnh quá lớn ({width}x{height}). Max: {self.MAX_DIMENSION}x{self.MAX_DIMENSION}px")
                 
-                # Check if image has content
                 if width == 0 or height == 0:
                     raise ImageError("Ảnh không có nội dung (0x0).")
                 
@@ -181,7 +233,7 @@ class ImageService:
             logger.error(f"Unexpected error validating image: {e}")
             raise ImageError(f"Lỗi không xác định khi xử lý ảnh: {str(e)}")
 
-    def _build_messages(self, history: List[Dict], image_path: str) -> List[Dict]:
+    def _build_openai_messages(self, history: List[Dict], image_path: str) -> List[Dict]:
         """Build messages for OpenAI API"""
         try:
             messages = [
@@ -191,7 +243,6 @@ class ImageService:
                 }
             ]
             
-            # Add conversation history
             for msg in history:
                 if msg["role"] == "user":
                     messages.append({
