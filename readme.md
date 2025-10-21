@@ -149,6 +149,80 @@ The application will be served at `http://127.0.0.1:8000`.
 4.  For **CSV Chat**, either upload a file or provide a URL and use the "Process URL" button before submitting queries.
 5.  The "Clear" button in the input area can be used to reset the current conversation.
 
+## Quick Start with Docker (Recommended)
+
+Docker provides the fastest way to get the application running without manual dependency management.
+
+### Prerequisites
+- Docker and Docker Compose installed
+- API keys (OpenAI or Google Gemini)
+
+### Method 1: Automated Setup (Recommended)
+```bash
+# 1. Clone repository
+git clone https://github.com/your-username/your-repo-name.git
+cd your-repo-name
+
+# 2. Configure environment
+cp .env.example .env
+nano .env  # Add your API keys
+
+# 3. Run automated script
+chmod +x quick-start.sh
+./quick-start.sh
+```
+
+**Access:** http://localhost:8000
+
+### Method 2: Manual Docker Compose
+```bash
+# 1. Clone and setup
+git clone https://github.com/your-username/your-repo-name.git
+cd your-repo-name
+cp .env.example .env
+nano .env  # Add API keys
+
+# 2. Build and run
+docker-compose up -d --build
+
+# 3. View logs
+docker-compose logs -f app
+```
+
+**Access:** http://localhost:8000
+
+### Environment Configuration
+Create `.env` from `.env.example`:
+
+**OpenAI:**
+```env
+OPENAI_API_KEY=sk-your-key-here
+OPENAI_MODEL_NAME=gpt-4o-mini
+LLM_PROVIDER=openai
+```
+
+**Google Gemini:**
+```env
+GOOGLE_API_KEY=your-google-key-here
+GEMINI_MODEL_NAME=gemini-2.0-flash-exp
+LLM_PROVIDER=gemini
+```
+
+### Docker Commands
+```bash
+# Stop services
+docker-compose down
+
+# View logs
+docker-compose logs -f
+
+# Restart
+docker-compose restart
+
+# Clean up
+docker-compose down -v
+```
+
 ## License
 
 This project is licensed under the MIT License.
