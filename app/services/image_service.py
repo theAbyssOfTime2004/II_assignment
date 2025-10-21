@@ -28,7 +28,7 @@ class ImageService:
         self.openai_client = OpenAI(api_key=OPENAI_API_KEY) if OPENAI_API_KEY else None
         self.upload_dir = Path("uploads/images")
         self.upload_dir.mkdir(parents=True, exist_ok=True)
-        logger.info(f"Image Service initialized with provider: {self.provider}")
+        logger.info(f"Image Service initialized with provider: {self.provider}")  # Already in English
 
     async def process_image_message(
         self, 
@@ -65,14 +65,14 @@ class ImageService:
             
             if not current_image_path:
                 return {
-                    "response": "⚠️ **Lỗi:** Vui lòng upload một ảnh trước khi đặt câu hỏi.\n\n📸 **Định dạng hỗ trợ:** PNG, JPG, JPEG, GIF, WebP\n📏 **Kích thước tối đa:** 20MB",
+                    "response": "⚠️ **Error:** Please upload an image before asking questions.\n\n📸 **Supported formats:** PNG, JPG, JPEG, GIF, WebP\n📏 **Max size:** 20MB",  # Changed from Vietnamese
                     "conversation_id": conversation_id
                 }
             
             # Check if image file exists
             if not Path(current_image_path).exists():
                 return {
-                    "response": "⚠️ **Lỗi:** Ảnh đã bị xóa hoặc không tồn tại. Vui lòng upload lại.",
+                    "response": "⚠️ **Error:** Image has been deleted or does not exist. Please upload again.",  # Changed from Vietnamese
                     "conversation_id": conversation_id
                 }
             
@@ -101,11 +101,11 @@ class ImageService:
                     )
                     
                 if not response_text:
-                    response_text = "⚠️ Xin lỗi, tôi không thể phân tích ảnh lúc này. Vui lòng thử lại sau."
+                    response_text = "⚠️ Sorry, I cannot analyze the image right now. Please try again later."  # Changed from Vietnamese
                     
             except Exception as e:
-                logger.error(f"LLM API error: {e}")
-                response_text = f"⚠️ **Lỗi API:** Không thể phân tích ảnh. {str(e)}\n\n💡 Vui lòng thử lại sau."
+                logger.error(f"LLM API error: {e}")  # Already in English
+                response_text = f"⚠️ **API Error:** Cannot analyze image. {str(e)}\n\n💡 Please try again later."  # Changed from Vietnamese
             
             # Add assistant message
             assistant_msg = {
@@ -125,15 +125,15 @@ class ImageService:
             }
             
         except ImageError as e:
-            logger.error(f"Image processing error: {e}")
+            logger.error(f"Image processing error: {e}")  # Already in English
             return {
-                "response": f"⚠️ **Lỗi xử lý ảnh:** {str(e)}",
+                "response": f"⚠️ **Image processing error:** {str(e)}",  # Changed from Vietnamese
                 "conversation_id": conversation_id
             }
         except Exception as e:
-            logger.error(f"Unexpected error in image processing: {e}")
+            logger.error(f"Unexpected error in image processing: {e}")  # Already in English
             return {
-                "response": "❌ **Lỗi không xác định.** Vui lòng thử lại hoặc upload ảnh khác.",
+                "response": "❌ **Unexpected error.** Please try again or upload a different image.",  # Changed from Vietnamese
                 "conversation_id": conversation_id
             }
 
@@ -145,14 +145,14 @@ class ImageService:
     ) -> str:
         """Query using Google Gemini"""
         # Build context from history
-        context = "Lịch sử hội thoại:\n"
+        context = "Conversation history:\n"  # Already in English
         for msg in history[-5:]:  # Last 5 messages
             if msg["role"] == "user":
-                context += f"Người dùng: {msg['content']}\n"
+                context += f"User: {msg['content']}\n"
             else:
-                context += f"Trợ lý: {msg['content']}\n"
+                context += f"Assistant: {msg['content']}\n"
         
-        full_prompt = f"{context}\nCâu hỏi hiện tại: {message}\n\nVui lòng phân tích ảnh và trả lời bằng tiếng Việt."
+        full_prompt = f"{context}\nCurrent question: {message}\n\nPlease analyze the image and respond in English."  # Changed from Vietnamese
         
         return gemini_service.call_llm_with_image(
             prompt=full_prompt,
@@ -188,16 +188,16 @@ class ImageService:
         try:
             # Check file size
             if len(image_data) > self.MAX_FILE_SIZE:
-                raise ImageError(f"Ảnh quá lớn (max {self.MAX_FILE_SIZE // (1024*1024)}MB). Vui lòng upload ảnh nhỏ hơn.")
+                raise ImageError(f"Image too large (max {self.MAX_FILE_SIZE // (1024*1024)}MB). Please upload a smaller image.")  # Changed from Vietnamese
             
             # Check if empty
             if len(image_data) == 0:
-                raise ImageError("File ảnh trống. Vui lòng chọn ảnh hợp lệ.")
+                raise ImageError("Image file is empty. Please select a valid image.")  # Changed from Vietnamese
             
             # Check file extension
             file_ext = Path(image_filename).suffix.lower().lstrip('.')
             if file_ext not in self.ALLOWED_FORMATS:
-                raise ImageError(f"Định dạng không hỗ trợ: .{file_ext}\n\n✅ **Hỗ trợ:** {', '.join(f'.{fmt}' for fmt in self.ALLOWED_FORMATS)}")
+                raise ImageError(f"Unsupported format: .{file_ext}\n\n✅ **Supported:** {', '.join(f'.{fmt}' for fmt in self.ALLOWED_FORMATS)}")  # Changed from Vietnamese
             
             # Validate image with PIL
             try:
@@ -208,17 +208,17 @@ class ImageService:
                 width, height = img.size
                 
                 if width > self.MAX_DIMENSION or height > self.MAX_DIMENSION:
-                    raise ImageError(f"Kích thước ảnh quá lớn ({width}x{height}). Max: {self.MAX_DIMENSION}x{self.MAX_DIMENSION}px")
+                    raise ImageError(f"Image dimensions too large ({width}x{height}). Max: {self.MAX_DIMENSION}x{self.MAX_DIMENSION}px")  # Changed from Vietnamese
                 
                 if width == 0 or height == 0:
-                    raise ImageError("Ảnh không có nội dung (0x0).")
+                    raise ImageError("Image has no content (0x0).")  # Changed from Vietnamese
                 
-                logger.info(f"Image validated: {image_filename}, {width}x{height}, format: {img.format}")
+                logger.info(f"Image validated: {image_filename}, {width}x{height}, format: {img.format}")  # Already in English
                 
             except Exception as e:
                 if isinstance(e, ImageError):
                     raise
-                raise ImageError(f"File không phải là ảnh hợp lệ: {str(e)}")
+                raise ImageError(f"File is not a valid image: {str(e)}")  # Changed from Vietnamese
             
             # Save image
             image_path = self.upload_dir / f"{conversation_id}_{image_filename}"
@@ -230,8 +230,8 @@ class ImageService:
         except ImageError:
             raise
         except Exception as e:
-            logger.error(f"Unexpected error validating image: {e}")
-            raise ImageError(f"Lỗi không xác định khi xử lý ảnh: {str(e)}")
+            logger.error(f"Unexpected error validating image: {e}")  # Already in English
+            raise ImageError(f"Unexpected error processing image: {str(e)}")  # Changed from Vietnamese
 
     def _build_openai_messages(self, history: List[Dict], image_path: str) -> List[Dict]:
         """Build messages for OpenAI API"""
@@ -239,7 +239,7 @@ class ImageService:
             messages = [
                 {
                     "role": "system",
-                    "content": "You are a helpful assistant that can analyze images. Respond in Vietnamese."
+                    "content": "You are a helpful assistant that can analyze images. Respond in English."  # Already in English
                 }
             ]
             
@@ -273,8 +273,8 @@ class ImageService:
             return messages
             
         except Exception as e:
-            logger.error(f"Error building messages: {e}")
-            raise ImageError(f"Lỗi khi chuẩn bị ảnh: {str(e)}")
+            logger.error(f"Error building messages: {e}")  # Already in English
+            raise ImageError(f"Error preparing image: {str(e)}")  # Changed from Vietnamese
 
     async def get_history(self, conversation_id: str) -> List[Dict[str, Any]]:
         try:
@@ -282,7 +282,7 @@ class ImageService:
             data = await redis_service.get(key)
             return json.loads(data) if data else []
         except Exception as e:
-            logger.error(f"Error getting history: {e}")
+            logger.error(f"Error getting history: {e}")  # Already in English
             return []
 
     async def save_history(self, conversation_id: str, history: List[Dict[str, Any]]):
@@ -290,6 +290,6 @@ class ImageService:
             key = f"image_chat_history:{conversation_id}"
             await redis_service.set(key, json.dumps(history), expire=86400)
         except Exception as e:
-            logger.error(f"Error saving history: {e}")
+            logger.error(f"Error saving history: {e}")  # Already in English
 
 image_service = ImageService()

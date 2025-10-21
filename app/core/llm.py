@@ -10,6 +10,7 @@ class LLMService:
     def __init__(self):
         self.provider = LLM_PROVIDER
         self.openai_client = OpenAI(api_key=OPENAI_API_KEY) if OPENAI_API_KEY else None
+        self.system_prompt = "You are a helpful assistant. Respond in English."  # Changed from Vietnamese
         logger.info(f"LLM Service initialized with provider: {self.provider}")
 
     def call_llm(

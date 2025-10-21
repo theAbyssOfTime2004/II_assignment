@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -24,6 +24,10 @@
             --color-accent-light: #e8eaed;
             --color-border: #e5e5e5;
             --color-shadow: rgba(0, 0, 0, 0.04);
+            --color-primary: #4a5568; /* Added for table headers */
+            --color-success: #10b981;
+            --color-warning: #f59e0b;
+            --color-error: #ef4444;
             --spacing-xs: 8px;
             --spacing-sm: 16px;
             --spacing-md: 24px;
@@ -46,6 +50,7 @@
             --color-accent-light: #3a3a3a;
             --color-border: #404040;
             --color-shadow: rgba(0, 0, 0, 0.3);
+            --color-primary: #6b7280; /* Darker theme color for headers */
             --shadow-subtle: 0 2px 8px rgba(0, 0, 0, 0.3);
             --shadow-medium: 0 4px 16px rgba(0, 0, 0, 0.4);
         }
@@ -260,104 +265,7 @@
             font-size: 15px;
         }
 
-        /* Markdown rendering */
-        .message-content h2 {
-            font-size: 1.3em;
-            font-weight: 600;
-            margin: 0.5em 0 0.3em 0;
-            color: var(--color-primary);
-        }
-
-        .message-content h3 {
-            font-size: 1.1em;
-            font-weight: 600;
-            margin: 0.8em 0 0.3em 0;
-            color: var(--color-text);
-        }
-
-        .message-content table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 1em 0;
-            font-size: 0.9em;
-            background: var(--color-surface);
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-        .message-content table th {
-            background: var(--color-primary);
-            color: white;
-            padding: 10px 12px;
-            text-align: left;
-            font-weight: 600;
-        }
-
-        .message-content table td {
-            padding: 10px 12px;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-        }
-
-        [data-theme="dark"] .message-content table td {
-            border-bottom-color: rgba(255, 255, 255, 0.05);
-        }
-
-        .message-content table tr:last-child td {
-            border-bottom: none;
-        }
-
-        .message-content table tr:nth-child(even) {
-            background: rgba(0, 0, 0, 0.02);
-        }
-
-        [data-theme="dark"] .message-content table tr:nth-child(even) {
-            background: rgba(255, 255, 255, 0.02);
-        }
-
-        .message-content code {
-            background: rgba(0, 0, 0, 0.05);
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-family: 'Courier New', monospace;
-            font-size: 0.9em;
-            color: var(--color-primary);
-        }
-
-        [data-theme="dark"] .message-content code {
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .message-content pre {
-            background: rgba(0, 0, 0, 0.03);
-            padding: 12px;
-            border-radius: 8px;
-            overflow-x: auto;
-            border-left: 3px solid var(--color-primary);
-        }
-
-        [data-theme="dark"] .message-content pre {
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        .message-content ul, .message-content ol {
-            margin: 0.5em 0;
-            padding-left: 1.5em;
-        }
-
-        .message-content li {
-            margin: 0.3em 0;
-        }
-
-        .message-content strong {
-            font-weight: 600;
-            color: var(--color-text);
-        }
-
-        .message-content em {
-            font-style: italic;
-            color: var(--color-text-secondary);
-        }
-
+        /* User message styling - restore original look */
         .user {
             margin-left: auto;
         }
@@ -369,11 +277,273 @@
             box-shadow: 0 4px 12px rgba(74, 85, 104, 0.15);
         }
 
+        [data-theme="dark"] .user .message-content {
+            background: var(--color-accent);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Assistant message styling */
         .assistant .message-content {
             background: var(--color-surface);
             color: var(--color-text-primary);
             border: 1px solid var(--color-border);
             box-shadow: var(--shadow-subtle);
+        }
+
+        /* Enhanced Markdown rendering - ONLY for assistant messages */
+        .assistant .message-content h1 {
+            font-size: 1.8em;
+            font-weight: 700;
+            margin: 0.8em 0 0.4em 0;
+            color: var(--color-text-primary);
+            border-bottom: 2px solid var(--color-border);
+            padding-bottom: 0.3em;
+        }
+
+        .assistant .message-content h2 {
+            font-size: 1.5em;
+            font-weight: 600;
+            margin: 0.7em 0 0.4em 0;
+            color: var(--color-text-primary);
+        }
+
+        .assistant .message-content h3 {
+            font-size: 1.2em;
+            font-weight: 600;
+            margin: 0.6em 0 0.3em 0;
+            color: var(--color-text-primary);
+        }
+
+        .assistant .message-content h4 {
+            font-size: 1.1em;
+            font-weight: 600;
+            margin: 0.5em 0 0.3em 0;
+            color: var(--color-text-secondary);
+        }
+
+        .assistant .message-content p {
+            margin: 0.5em 0;
+        }
+
+        /* Table styling - ONLY for assistant messages */
+        .assistant .message-content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.2em 0;
+            font-size: 0.85em;
+            background: var(--color-surface);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: var(--shadow-subtle);
+            display: block;
+            overflow-x: auto;
+            max-width: 100%;
+        }
+
+        .assistant .message-content table thead,
+        .assistant .message-content table tbody,
+        .assistant .message-content table tr {
+            display: table;
+            width: 100%;
+            table-layout: fixed;
+        }
+
+        .assistant .message-content table th {
+            background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-primary) 100%);
+            color: #ffffff !important;
+            padding: 12px 14px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.95em;
+            letter-spacing: 0.02em;
+            border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+            white-space: normal;
+            word-wrap: break-word;
+            min-width: 100px;
+            max-width: 200px;
+        }
+
+        .assistant .message-content table td {
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--color-border);
+            color: var(--color-text-primary);
+            white-space: normal;
+            word-wrap: break-word;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            min-width: 100px;
+            max-width: 200px;
+        }
+
+        /* Fix for code elements inside tables (data types) - ONLY assistant */
+        .assistant .message-content table code {
+            background: rgba(74, 85, 104, 0.15) !important;
+            color: var(--color-accent) !important;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        [data-theme="dark"] .assistant .message-content table code {
+            background: rgba(255, 255, 255, 0.15) !important;
+            color: #a0d8f1 !important;
+        }
+
+        .assistant .message-content table th strong {
+            color: #ffffff !important;
+            font-weight: 700;
+        }
+
+        .assistant .message-content table tbody tr:hover {
+            background: rgba(74, 85, 104, 0.05);
+            transition: background 0.2s ease;
+        }
+
+        [data-theme="dark"] .assistant .message-content table tbody tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .assistant .message-content table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .assistant .message-content table tr:nth-child(even) {
+            background: rgba(0, 0, 0, 0.02);
+        }
+
+        [data-theme="dark"] .assistant .message-content table tr:nth-child(even) {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        /* Responsive table scrollbar - ONLY assistant */
+        .assistant .message-content table::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .assistant .message-content table::-webkit-scrollbar-track {
+            background: var(--color-bg);
+            border-radius: 4px;
+        }
+
+        .assistant .message-content table::-webkit-scrollbar-thumb {
+            background: var(--color-border);
+            border-radius: 4px;
+        }
+
+        .assistant .message-content table::-webkit-scrollbar-thumb:hover {
+            background: var(--color-text-secondary);
+        }
+
+        /* Mobile optimization - ONLY assistant */
+        @media (max-width: 768px) {
+            .assistant .message-content table {
+                font-size: 0.75em;
+            }
+            
+            .assistant .message-content table th,
+            .assistant .message-content table td {
+                padding: 8px 10px;
+                min-width: 80px;
+                max-width: 150px;
+            }
+        }
+
+        /* Code and pre styling - for assistant only */
+        .assistant .message-content code {
+            background: rgba(74, 85, 104, 0.1);
+            padding: 3px 7px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+            font-size: 0.88em;
+            color: var(--color-accent);
+            font-weight: 500;
+        }
+
+        [data-theme="dark"] .assistant .message-content code {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--color-accent-light);
+        }
+
+        .assistant .message-content pre {
+            background: rgba(0, 0, 0, 0.04);
+            padding: 14px 16px;
+            border-radius: 8px;
+            overflow-x: auto;
+            border-left: 4px solid var(--color-accent);
+            margin: 1em 0;
+        }
+
+        [data-theme="dark"] .assistant .message-content pre {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .assistant .message-content pre code {
+            background: transparent;
+            padding: 0;
+            color: var(--color-text-primary);
+            font-size: 0.9em;
+        }
+
+        .assistant .message-content ul, 
+        .assistant .message-content ol {
+            margin: 0.8em 0;
+            padding-left: 2em;
+        }
+
+        .assistant .message-content li {
+            margin: 0.4em 0;
+        }
+
+        .assistant .message-content ul li::marker {
+            color: var(--color-accent);
+        }
+
+        .assistant .message-content ol li::marker {
+            color: var(--color-accent);
+            font-weight: 600;
+        }
+
+        .assistant .message-content strong {
+            font-weight: 600;
+            color: var(--color-text-primary);
+        }
+
+        .assistant .message-content em {
+            font-style: italic;
+            color: var(--color-text-secondary);
+        }
+
+        .assistant .message-content hr {
+            border: none;
+            border-top: 2px solid var(--color-border);
+            margin: 1.5em 0;
+        }
+
+        .assistant .message-content blockquote {
+            border-left: 4px solid var(--color-accent);
+            padding-left: 1em;
+            margin: 1em 0;
+            color: var(--color-text-secondary);
+            font-style: italic;
+            background: rgba(0, 0, 0, 0.02);
+            padding: 0.8em 1em;
+            border-radius: 4px;
+        }
+
+        [data-theme="dark"] .assistant .message-content blockquote {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        /* User messages should NOT have any Markdown formatting */
+        .user .message-content * {
+            color: white !important;
+        }
+
+        .user .message-content code {
+            background: rgba(255, 255, 255, 0.2) !important;
+            color: white !important;
         }
 
         .message-info {
@@ -388,6 +558,7 @@
 
         .user .message-info {
             text-align: right;
+            color: var(--color-text-secondary);
         }
 
         .image-preview {
@@ -398,6 +569,10 @@
             max-width: 400px;
             box-shadow: var(--shadow-subtle);
             transition: var(--transition-smooth);
+        }
+
+        .user .image-preview {
+            border: 1px solid rgba(255, 255, 255, 0.3);
         }
 
         .image-preview:hover {
@@ -721,28 +896,19 @@
         </div>
 
         <div class="chat-container">
-            <!-- Core Chat -->
             <div id="core-tab" class="tab-content active">
                 <div id="chat"></div>
             </div>
-
-            <!-- Image Chat -->
             <div id="image-tab" class="tab-content">
                 <div id="image-chat"></div>
             </div>
-
-            <!-- CSV Chat -->
             <div id="csv-tab" class="tab-content">
                 <div id="csv-chat"></div>
             </div>
         </div>
 
         <div class="input-area">
-            <!-- File Upload Area (for Image and CSV) -->
-            <div id="file-upload-area" class="file-upload-area">
-                <!-- This area will be populated by JS based on the active tab -->
-            </div>
-
+            <div id="file-upload-area" class="file-upload-area"></div>
             <div class="input-wrapper">
                 <input id="input" type="text" placeholder="Type your message...">
                 <button onclick="sendMessage()">Send</button>

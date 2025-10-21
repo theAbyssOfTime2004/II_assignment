@@ -14,20 +14,21 @@ class ChatService:
     MAX_HISTORY_LENGTH = 50
     
     def __init__(self):
-        self.system_prompt = "You are a helpful assistant. Respond in Vietnamese."
+        self.system_prompt = "You are a helpful assistant. Respond in English."  # Already in English
+        logger.info("Chat service initialized")  # Already in English
 
     async def process_message(self, request: ChatRequest) -> ChatResponse:
         try:
             # Validate message
             if not request.message or not request.message.strip():
                 return ChatResponse(
-                    response="⚠️ Tin nhắn trống. Vui lòng nhập nội dung.",
+                    response="⚠️ Message is empty. Please enter content.",  # Changed from Vietnamese
                     conversation_id=request.conversation_id or str(uuid.uuid4())
                 )
             
             if len(request.message) > self.MAX_MESSAGE_LENGTH:
                 return ChatResponse(
-                    response=f"⚠️ Tin nhắn quá dài (max {self.MAX_MESSAGE_LENGTH} ký tự). Vui lòng rút gọn.",
+                    response=f"⚠️ Message too long (max {self.MAX_MESSAGE_LENGTH} characters). Please shorten.",  # Changed from Vietnamese
                     conversation_id=request.conversation_id or str(uuid.uuid4())
                 )
             
@@ -38,7 +39,7 @@ class ChatService:
             
             # Limit history length
             if len(history) > self.MAX_HISTORY_LENGTH:
-                logger.warning(f"History too long ({len(history)}), truncating")
+                logger.warning(f"History too long ({len(history)}), truncating")  # Already in English
                 history = history[-self.MAX_HISTORY_LENGTH:]
             
             # Add user message
@@ -55,10 +56,10 @@ class ChatService:
                     f"History:\n{context}\nUser: {request.message}"
                 )
                 if not response_text:
-                    response_text = "⚠️ Xin lỗi, tôi không thể trả lời lúc này. Vui lòng thử lại sau."
+                    response_text = "⚠️ Sorry, I cannot respond right now. Please try again later."  # Changed from Vietnamese
             except Exception as e:
-                logger.error(f"LLM error: {e}")
-                response_text = "❌ **Lỗi kết nối AI.** Vui lòng thử lại sau."
+                logger.error(f"LLM error: {e}")  # Already in English
+                response_text = "❌ **AI connection error.** Please try again later."  # Changed from Vietnamese
             
             # Add assistant message
             assistant_msg = Message(role="assistant", content=response_text, timestamp=datetime.now().isoformat())
@@ -70,9 +71,9 @@ class ChatService:
             return ChatResponse(response=response_text, conversation_id=conversation_id)
             
         except Exception as e:
-            logger.error(f"Unexpected error in chat service: {e}")
+            logger.error(f"Unexpected error in chat service: {e}")  # Already in English
             return ChatResponse(
-                response="❌ **Lỗi không xác định.** Vui lòng thử lại.",
+                response="❌ **Unexpected error.** Please try again.",  # Changed from Vietnamese
                 conversation_id=request.conversation_id or str(uuid.uuid4())
             )
 
@@ -82,7 +83,7 @@ class ChatService:
             data = await redis_service.get(key)
             return json.loads(data) if data else []
         except Exception as e:
-            logger.error(f"Error getting history: {e}")
+            logger.error(f"Error getting history: {e}")  # Already in English
             return []
 
     async def save_history(self, conversation_id: str, history: List[Dict[str, Any]]):
@@ -90,4 +91,4 @@ class ChatService:
             key = f"chat_history:{conversation_id}"
             await redis_service.set(key, json.dumps(history), expire=86400)
         except Exception as e:
-            logger.error(f"Error saving history: {e}")
+            logger.error(f"Error saving history: {e}")  # Already in English
