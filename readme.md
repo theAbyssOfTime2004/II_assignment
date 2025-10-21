@@ -224,11 +224,4 @@ docker-compose down -v
 ```
 ## Demo Video
 
-A short demo: 
-
-<!doctype html>
-<html>
-  <body>
-    <iframe width="315" height="560" src="https://www.youtube.com/embed/rEOMzFOZUC8" allowfullscreen></iframe>
-  </body>
-</html>
+[![Watch demo](https://img.youtube.com/vi/rEOMzFOZUC8/0.jpg)](https://www.youtube.com/shorts/rEOMzFOZUC8)
