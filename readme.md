@@ -226,6 +226,12 @@ docker-compose down -v
 
 A short demo: 
 
-<video width="560" height="315" controls>
-  <source src="demo/demo.mp4" type="video/mp4">
-</video>
+<iframe 
+    width="315" 
+    height="560" 
+    src="https://www.youtube.com/embed/rEOMzFOZUC8" 
+    title="App Demo" 
+    frameborder="0" 
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+    allowfullscreen>
+</iframe>
